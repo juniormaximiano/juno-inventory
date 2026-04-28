@@ -1,6 +1,6 @@
 package com.juno.inventory.model;
 
-public enum tipoMovimentacao {
+public enum TipoMovimentacao {
     ENTRADA,
     SAIDA
 }

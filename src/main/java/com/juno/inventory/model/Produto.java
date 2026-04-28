@@ -17,7 +17,6 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    private int quantidade;
     private BigDecimal preco;
     @Column(unique = true)
     private String sku;
@@ -35,16 +34,14 @@ public class Produto {
     public Produto() {
     }
 
-    public Produto(String nome, int quantidade, String sku, BigDecimal preco) {
+    public Produto(String nome,  String sku, BigDecimal preco) {
         this.nome = nome;
-        this.quantidade = quantidade;
         this.sku = sku;
         this.preco = preco;
     }
 
     public Produto(ProdutoSaveDTO produto) {
         this.nome = produto.nome();
-        this.quantidade = produto.quantidade();
         this.preco = produto.preco();
         this.sku = produto.sku() != null ? produto.sku().toUpperCase() : null;
     }
@@ -63,14 +60,6 @@ public class Produto {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public int getQuantidade() {
-        return quantidade;
-    }
-
-    public void setQuantidade(int quantidade) {
-        this.quantidade = quantidade;
     }
 
     public BigDecimal getPreco() {
