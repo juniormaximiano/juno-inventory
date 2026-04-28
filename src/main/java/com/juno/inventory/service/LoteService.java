@@ -1,5 +1,6 @@
 package com.juno.inventory.service;
 
+import com.juno.inventory.dto.LoteSaidaDTO;
 import com.juno.inventory.dto.LoteSaveDTO;
 import com.juno.inventory.model.Lote;
 import com.juno.inventory.model.MovimentacaoEstoque;
@@ -51,15 +52,51 @@ public class LoteService {
         lote.setObservacao(dto.observacao());
         var loteCriado = loteRepository.save(lote);
 
-        MovimentacaoEstoque movimentacaoEstoque = new MovimentacaoEstoque();
-        movimentacaoEstoque.setTipoMovimentacao(TipoMovimentacao.ENTRADA);
-        movimentacaoEstoque.setLote(loteCriado);
-        movimentacaoEstoque.setQuantidade(dto.quantidadeInicial());
-        movimentacaoEstoque.setData(LocalDateTime.now());
-        movimentacaoEstoque.setResponsavel(dto.responsavel());
-        movimentacaoEstoque.setObservacao(dto.observacao());
-        movimentacaoEstoqueRepository.save(movimentacaoEstoque);
+        MovimentacaoEstoque movimentacaoEstoqueEntrada = new MovimentacaoEstoque();
+        movimentacaoEstoqueEntrada.setTipoMovimentacao(TipoMovimentacao.ENTRADA);
+        movimentacaoEstoqueEntrada.setLote(loteCriado);
+        movimentacaoEstoqueEntrada.setQuantidade(dto.quantidadeInicial());
+        movimentacaoEstoqueEntrada.setData(LocalDateTime.now());
+        movimentacaoEstoqueEntrada.setResponsavel(dto.responsavel());
+        movimentacaoEstoqueEntrada.setObservacao(dto.observacao());
+        movimentacaoEstoqueRepository.save(movimentacaoEstoqueEntrada);
         return loteCriado;
+
+
+    }
+
+    public Lote darBaixaLote(LoteSaidaDTO dto) {
+        Optional<Lote> loteBuscado = loteRepository.findById(dto.idLote());
+        var quantidadeSaida = dto.quantidade();
+
+        if (loteBuscado.isEmpty()) {
+            throw new RuntimeException("Lote não encontrado.");
+        }
+
+        Lote lote = loteBuscado.get();
+
+        if (quantidadeSaida <= 0) {
+            throw new RuntimeException("Quantidade de saída deve ser maior que zero.");
+        }
+
+        if (quantidadeSaida > lote.getQuantidadeAtual()) {
+            throw new RuntimeException("Quantidade de saída maior que o estoque disponível.");
+        }
+
+        var quantidadeAtual = lote.getQuantidadeAtual();
+        var novaQuantidade = quantidadeAtual - quantidadeSaida;
+
+        lote.setQuantidadeAtual(novaQuantidade);
+
+        MovimentacaoEstoque movimentacaoEstoqueSaida = new MovimentacaoEstoque();
+        movimentacaoEstoqueSaida.setTipoMovimentacao(TipoMovimentacao.SAIDA);
+        movimentacaoEstoqueSaida.setLote(lote);
+        movimentacaoEstoqueSaida.setData(LocalDateTime.now());
+        movimentacaoEstoqueSaida.setQuantidade(dto.quantidade());
+        movimentacaoEstoqueSaida.setResponsavel(dto.responsavel());
+        movimentacaoEstoqueSaida.setObservacao(dto.observacao());
+           movimentacaoEstoqueRepository.save(movimentacaoEstoqueSaida);
+        return loteRepository.save(lote);
 
 
     }

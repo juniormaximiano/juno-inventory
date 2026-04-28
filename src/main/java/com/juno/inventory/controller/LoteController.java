@@ -1,5 +1,6 @@
 package com.juno.inventory.controller;
 
+import com.juno.inventory.dto.LoteSaidaDTO;
 import com.juno.inventory.dto.LoteSaveDTO;
 import com.juno.inventory.model.Lote;
 import com.juno.inventory.service.LoteService;
@@ -21,5 +22,10 @@ public class LoteController {
     @PostMapping
     public Lote criarLote(@RequestBody @Valid LoteSaveDTO lote) {
         return this.loteService.criarLote(lote);
+    }
+
+    @PostMapping("/saida")
+    public Lote darBaixaLote(@RequestBody @Valid LoteSaidaDTO dto) {
+        return this.loteService.darBaixaLote(dto);
     }
 }
