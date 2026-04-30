@@ -12,6 +12,7 @@ import com.juno.inventory.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,7 +27,6 @@ public class LoteService {
         this.produtoRepository = produtoRepository;
         this.movimentacaoEstoqueRepository = movimentacaoEstoqueRepository;
     }
-
 
     public Lote criarLote(LoteSaveDTO dto) {
         Optional<Produto> produtoOptional = produtoRepository.findById(dto.produtoId());
@@ -67,6 +67,22 @@ public class LoteService {
 
     public Lote darBaixaLote(LoteSaidaDTO dto) {
         Optional<Lote> loteBuscado = loteRepository.findById(dto.idLote());
+        Lote lote = getLote(dto, loteBuscado);
+
+        MovimentacaoEstoque movimentacaoEstoqueSaida = new MovimentacaoEstoque();
+        movimentacaoEstoqueSaida.setTipoMovimentacao(TipoMovimentacao.SAIDA);
+        movimentacaoEstoqueSaida.setLote(lote);
+        movimentacaoEstoqueSaida.setData(LocalDateTime.now());
+        movimentacaoEstoqueSaida.setQuantidade(dto.quantidade());
+        movimentacaoEstoqueSaida.setResponsavel(dto.responsavel());
+        movimentacaoEstoqueSaida.setObservacao(dto.observacao());
+        movimentacaoEstoqueRepository.save(movimentacaoEstoqueSaida);
+        return loteRepository.save(lote);
+
+
+    }
+
+    private static Lote getLote(LoteSaidaDTO dto, Optional<Lote> loteBuscado) {
         var quantidadeSaida = dto.quantidade();
 
         if (loteBuscado.isEmpty()) {
@@ -87,17 +103,41 @@ public class LoteService {
         var novaQuantidade = quantidadeAtual - quantidadeSaida;
 
         lote.setQuantidadeAtual(novaQuantidade);
+        return lote;
+    }
 
-        MovimentacaoEstoque movimentacaoEstoqueSaida = new MovimentacaoEstoque();
-        movimentacaoEstoqueSaida.setTipoMovimentacao(TipoMovimentacao.SAIDA);
-        movimentacaoEstoqueSaida.setLote(lote);
-        movimentacaoEstoqueSaida.setData(LocalDateTime.now());
-        movimentacaoEstoqueSaida.setQuantidade(dto.quantidade());
-        movimentacaoEstoqueSaida.setResponsavel(dto.responsavel());
-        movimentacaoEstoqueSaida.setObservacao(dto.observacao());
-           movimentacaoEstoqueRepository.save(movimentacaoEstoqueSaida);
-        return loteRepository.save(lote);
+    public List<Lote> listarLotes() {
+        return loteRepository.findAll();
+    }
+
+    public Lote getLoteById(Long id) {
+        var loteBuscado = loteRepository.findById(id);
+        if (loteBuscado.isPresent()) {
+            return loteBuscado.get();
+        } else {
+            throw new RuntimeException("Lote Não encontrado.");
+        }
 
 
     }
+
+    public List<MovimentacaoEstoque> getHistoricoLoteById(Long id) {
+
+        var loteBuscado = loteRepository.findById(id);
+
+        if (loteBuscado.isPresent()) {
+
+            return movimentacaoEstoqueRepository.findByLote(loteBuscado.get());
+
+        } else {
+            throw new RuntimeException("Lote não encontrado.");
+        }
+
+    }
 }
+
+
+
+
+
+
