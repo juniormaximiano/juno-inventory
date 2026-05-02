@@ -2,17 +2,28 @@ package com.juno.inventory.dto;
 
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public record LoteSaveDTO(
 
-        @ManyToOne
-        @JoinColumn(name = "produto_id", nullable = false)
-         Long produtoId,
+        @NotNull
+        Long produtoId,
+
+        @NotBlank
         String codigoLote,
-        int quantidadeInicial,
+
+        @NotNull
+        @Positive
+        Integer quantidadeInicial,
+
+        @NotBlank
         String localizacao,
+
+        @NotBlank
         String responsavel,
+
         String observacao
 
-) {
-}
+) {}

@@ -9,8 +9,12 @@ import com.juno.inventory.model.TipoMovimentacao;
 import com.juno.inventory.repository.LoteRepository;
 import com.juno.inventory.repository.MovimentacaoEstoqueRepository;
 import com.juno.inventory.repository.ProdutoRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,17 +32,19 @@ public class LoteService {
         this.movimentacaoEstoqueRepository = movimentacaoEstoqueRepository;
     }
 
+    @Transactional
     public Lote criarLote(LoteSaveDTO dto) {
         Optional<Produto> produtoOptional = produtoRepository.findById(dto.produtoId());
         if (produtoOptional.isEmpty()) {
-            throw new RuntimeException("Produto não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado");
+
         }
         Produto produto = produtoOptional.get();
 
         boolean loteJaExiste = loteRepository.existsByCodigoLoteAndProduto(dto.codigoLote(), produto);
 
         if (loteJaExiste) {
-            throw new RuntimeException("Já existe um lote com esse código para esse produto");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lote já existente");
         }
 
         Lote lote = new Lote();
@@ -65,45 +71,44 @@ public class LoteService {
 
     }
 
+    @Transactional
     public Lote darBaixaLote(LoteSaidaDTO dto) {
         Optional<Lote> loteBuscado = loteRepository.findById(dto.idLote());
-        Lote lote = getLote(dto, loteBuscado);
-
-        MovimentacaoEstoque movimentacaoEstoqueSaida = new MovimentacaoEstoque();
-        movimentacaoEstoqueSaida.setTipoMovimentacao(TipoMovimentacao.SAIDA);
-        movimentacaoEstoqueSaida.setLote(lote);
-        movimentacaoEstoqueSaida.setData(LocalDateTime.now());
-        movimentacaoEstoqueSaida.setQuantidade(dto.quantidade());
-        movimentacaoEstoqueSaida.setResponsavel(dto.responsavel());
-        movimentacaoEstoqueSaida.setObservacao(dto.observacao());
-        movimentacaoEstoqueRepository.save(movimentacaoEstoqueSaida);
-        return loteRepository.save(lote);
-
-
-    }
-
-    private static Lote getLote(LoteSaidaDTO dto, Optional<Lote> loteBuscado) {
-        var quantidadeSaida = dto.quantidade();
 
         if (loteBuscado.isEmpty()) {
-            throw new RuntimeException("Lote não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não existente");
         }
 
         Lote lote = loteBuscado.get();
 
+        var quantidadeSaida = dto.quantidade();
+
         if (quantidadeSaida <= 0) {
-            throw new RuntimeException("Quantidade de saída deve ser maior que zero.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Quantidade de saída deve ser maior que zero.");
         }
 
         if (quantidadeSaida > lote.getQuantidadeAtual()) {
-            throw new RuntimeException("Quantidade de saída maior que o estoque disponível.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade de saída maior que o estoque disponível.");
         }
 
         var quantidadeAtual = lote.getQuantidadeAtual();
         var novaQuantidade = quantidadeAtual - quantidadeSaida;
 
         lote.setQuantidadeAtual(novaQuantidade);
-        return lote;
+
+        Lote loteAtualizado = loteRepository.save(lote);
+
+        MovimentacaoEstoque movimentacaoEstoqueSaida = new MovimentacaoEstoque();
+        movimentacaoEstoqueSaida.setTipoMovimentacao(TipoMovimentacao.SAIDA);
+        movimentacaoEstoqueSaida.setLote(loteAtualizado);
+        movimentacaoEstoqueSaida.setData(LocalDateTime.now());
+        movimentacaoEstoqueSaida.setQuantidade(quantidadeSaida);
+        movimentacaoEstoqueSaida.setResponsavel(dto.responsavel());
+        movimentacaoEstoqueSaida.setObservacao(dto.observacao());
+
+        movimentacaoEstoqueRepository.save(movimentacaoEstoqueSaida);
+
+        return loteAtualizado;
     }
 
     public List<Lote> listarLotes() {
@@ -115,7 +120,7 @@ public class LoteService {
         if (loteBuscado.isPresent()) {
             return loteBuscado.get();
         } else {
-            throw new RuntimeException("Lote Não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado");
         }
 
 
@@ -130,7 +135,7 @@ public class LoteService {
             return movimentacaoEstoqueRepository.findByLote(loteBuscado.get());
 
         } else {
-            throw new RuntimeException("Lote não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado");
         }
 
     }
