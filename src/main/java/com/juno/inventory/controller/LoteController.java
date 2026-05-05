@@ -4,6 +4,7 @@ import com.juno.inventory.dto.LoteSaidaDTO;
 import com.juno.inventory.dto.LoteSaveDTO;
 import com.juno.inventory.model.Lote;
 import com.juno.inventory.model.MovimentacaoEstoque;
+import com.juno.inventory.model.TipoMovimentacao;
 import com.juno.inventory.service.LoteService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +40,17 @@ public class LoteController {
         return this.loteService.getLoteById(id);
     }
 
-    @GetMapping("/{id}/movimentacoes")
+    @GetMapping("/{id}/movimentacoesTotais")
     public List<MovimentacaoEstoque>buscarHistoricoLote(Long id){
         return this.loteService.getHistoricoLoteById(id);
+    }
+
+    @GetMapping("/{id}/movimentacoesPorTipo")
+    public List<MovimentacaoEstoque> getMovimentacoesDoLote(
+            @PathVariable Long id,
+            @RequestParam(required = false) TipoMovimentacao tipo
+    ) {
+        return loteService.getMovimentacoesDoLote(id, tipo);
     }
 
 }

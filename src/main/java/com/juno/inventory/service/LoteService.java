@@ -84,7 +84,7 @@ public class LoteService {
         var quantidadeSaida = dto.quantidade();
 
         if (quantidadeSaida <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Quantidade de saída deve ser maior que zero.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade de saída deve ser maior que zero.");
         }
 
         if (quantidadeSaida > lote.getQuantidadeAtual()) {
@@ -139,6 +139,27 @@ public class LoteService {
         }
 
     }
+
+    public List<MovimentacaoEstoque> getMovimentacoesDoLote(Long id, TipoMovimentacao tipo) {
+        var loteBuscado = loteRepository.findById(id);
+
+        if (loteBuscado.isPresent()) {
+
+            Lote lote = loteBuscado.get();
+
+            if (tipo == null) {
+                return movimentacaoEstoqueRepository.findByLote(lote);
+            } else {
+
+                return movimentacaoEstoqueRepository.findByLoteAndTipoMovimentacao(lote, tipo);
+            }
+
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado");
+
+    }
+
 }
 
 
