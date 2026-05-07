@@ -12,10 +12,9 @@ public interface MovimentacaoEstoqueRepository extends JpaRepository<Movimentaca
 
     List<MovimentacaoEstoque> findByLote(Lote lote);
 
-    List<MovimentacaoEstoque> findByLoteAndTipoMovimentacao(
-            Lote lote,
-            TipoMovimentacao tipoMovimentacao
-    );
+    List<MovimentacaoEstoque> findByLoteAndTipoMovimentacao(Lote lote, TipoMovimentacao tipoMovimentacao);
 
     List<MovimentacaoEstoque> findByLoteAndDataBetween(Lote lote, LocalDateTime dataInicial, LocalDateTime dataFinal);
+
+    List<MovimentacaoEstoque> findByLoteAndTipoMovimentacaoAndDataBetween(Lote lote, TipoMovimentacao tipoMovimentacao, LocalDateTime dataInicial, LocalDateTime dataFinal);
 }

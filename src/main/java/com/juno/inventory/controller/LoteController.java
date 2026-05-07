@@ -11,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,6 +18,7 @@ import java.util.List;
 public class LoteController {
 
     final private LoteService loteService;
+
     public LoteController(LoteService loteService) {
         this.loteService = loteService;
     }
@@ -30,7 +30,7 @@ public class LoteController {
 
     @PostMapping("/saida")
     public Lote darBaixaLote(@RequestBody @Valid LoteSaidaDTO dto) {
-        return this.loteService.darBaixaLote(dto);
+        return this.loteService.registrarSaidaLote(dto);
     }
 
     @GetMapping
@@ -40,7 +40,7 @@ public class LoteController {
 
     @GetMapping("/{id}")
     public Lote buscarLotePorId(@PathVariable Long id) {
-        return this.loteService.getLoteById(id);
+        return this.loteService.buscarLotePorId(id);
     }
 
 
@@ -56,9 +56,10 @@ public class LoteController {
     public List<MovimentacaoEstoque> buscarMovimentacoesPorPeriodo(
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)  LocalDate dataFinal
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal,
+            @RequestParam(required = false) TipoMovimentacao tipoMovimentacao
     ) {
-        return loteService.getMovimentacoesPorPeriodo(id, dataInicial.atStartOfDay(), dataFinal.atTime(23, 59, 59));
+        return loteService.getMovimentacoesFiltradasDoLote(id, tipoMovimentacao, dataInicial.atStartOfDay(), dataFinal.atTime(23, 59, 59));
     }
 
 }
