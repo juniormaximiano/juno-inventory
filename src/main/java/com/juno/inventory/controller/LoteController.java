@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,10 +55,10 @@ public class LoteController {
     @GetMapping("/{id}/movimentacoesPorPeriodo")
     public List<MovimentacaoEstoque> buscarMovimentacoesPorPeriodo(
             @PathVariable Long id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicial,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime dataFinal
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)  LocalDate dataFinal
     ) {
-        return loteService.getMovimentacoesPorPeriodo(id, dataInicial, dataFinal);
+        return loteService.getMovimentacoesPorPeriodo(id, dataInicial.atStartOfDay(), dataFinal.atTime(23, 59, 59));
     }
 
 }
