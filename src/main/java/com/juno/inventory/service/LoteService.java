@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -126,20 +127,6 @@ public class LoteService {
 
     }
 
-    public List<MovimentacaoEstoque> getHistoricoLoteById(Long id) {
-
-        var loteBuscado = loteRepository.findById(id);
-
-        if (loteBuscado.isPresent()) {
-
-            return movimentacaoEstoqueRepository.findByLote(loteBuscado.get());
-
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado");
-        }
-
-    }
-
     public List<MovimentacaoEstoque> getMovimentacoesDoLote(Long id, TipoMovimentacao tipo) {
         var loteBuscado = loteRepository.findById(id);
 
@@ -160,6 +147,22 @@ public class LoteService {
 
     }
 
+    public List<MovimentacaoEstoque> getMovimentacoesPorPeriodo(Long id, LocalDateTime dataInicial, LocalDateTime dataFinal) {
+
+        var LoteBuscado = loteRepository.findById(id);
+
+
+        if (LoteBuscado.isPresent()) {
+
+            Lote loteUsing = LoteBuscado.get();
+
+            return movimentacaoEstoqueRepository.findByLoteAndDataBetween(loteUsing, dataInicial, dataFinal);
+
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado.");
+        }
+
+    }
 }
 
 

@@ -7,8 +7,10 @@ import com.juno.inventory.model.MovimentacaoEstoque;
 import com.juno.inventory.model.TipoMovimentacao;
 import com.juno.inventory.service.LoteService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -40,17 +42,22 @@ public class LoteController {
         return this.loteService.getLoteById(id);
     }
 
-    @GetMapping("/{id}/movimentacoesTotais")
-    public List<MovimentacaoEstoque>buscarHistoricoLote(Long id){
-        return this.loteService.getHistoricoLoteById(id);
-    }
 
     @GetMapping("/{id}/movimentacoesPorTipo")
-    public List<MovimentacaoEstoque> getMovimentacoesDoLote(
+    public List<MovimentacaoEstoque> buscarMovimentacoesDoLote(
             @PathVariable Long id,
             @RequestParam(required = false) TipoMovimentacao tipo
     ) {
         return loteService.getMovimentacoesDoLote(id, tipo);
+    }
+
+    @GetMapping("/{id}/movimentacoesPorPeriodo")
+    public List<MovimentacaoEstoque> buscarMovimentacoesPorPeriodo(
+            @PathVariable Long id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicial,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime dataFinal
+    ) {
+        return loteService.getMovimentacoesPorPeriodo(id, dataInicial, dataFinal);
     }
 
 }

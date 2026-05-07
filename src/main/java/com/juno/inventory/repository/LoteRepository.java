@@ -1,9 +1,12 @@
 package com.juno.inventory.repository;
 
 import com.juno.inventory.model.Lote;
+import com.juno.inventory.model.MovimentacaoEstoque;
 import com.juno.inventory.model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public interface LoteRepository extends JpaRepository<Lote,Long> {
