@@ -1,5 +1,6 @@
 package com.juno.inventory.service;
 
+import com.juno.inventory.dto.AjusteDTO;
 import com.juno.inventory.dto.LoteSaidaDTO;
 import com.juno.inventory.dto.LoteSaveDTO;
 import com.juno.inventory.model.Lote;
@@ -166,7 +167,40 @@ public class LoteService {
 
     }
 
+    @Transactional
+    public Lote ajustarLote(AjusteDTO ajusteDTO) {
 
+        var loteBuscado = loteRepository.findById(ajusteDTO.idLote());
+
+            if (loteBuscado.isPresent()) {
+
+                Lote lote = loteBuscado.get();
+
+                var quantidadeAtual = lote.getQuantidadeAtual();
+
+                var diferencaQuantidade = quantidadeAtual - ajusteDTO.novaQuantidade();
+
+                var quantidadeMovimentacao = Math.abs(diferencaQuantidade);
+
+                lote.setQuantidadeAtual(ajusteDTO.novaQuantidade());
+                var loteAtualizado = loteRepository.save(lote);
+
+                MovimentacaoEstoque movimentacaoEstoque = new MovimentacaoEstoque();
+                movimentacaoEstoque.setTipoMovimentacao(TipoMovimentacao.AJUSTE);
+                movimentacaoEstoque.setLote(lote);
+                movimentacaoEstoque.setData(LocalDateTime.now());
+                movimentacaoEstoque.setQuantidade(quantidadeMovimentacao);
+                movimentacaoEstoque.setResponsavel(ajusteDTO.responsavel());
+                movimentacaoEstoque.setObservacao(ajusteDTO.motivo());
+                movimentacaoEstoqueRepository.save(movimentacaoEstoque);
+                return loteAtualizado;
+
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado");
+            }
+
+
+    }
 }
 
 

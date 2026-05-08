@@ -1,5 +1,6 @@
 package com.juno.inventory.controller;
 
+import com.juno.inventory.dto.AjusteDTO;
 import com.juno.inventory.dto.LoteSaidaDTO;
 import com.juno.inventory.dto.LoteSaveDTO;
 import com.juno.inventory.model.Lote;
@@ -60,6 +61,12 @@ public class LoteController {
             @RequestParam(required = false) TipoMovimentacao tipoMovimentacao
     ) {
         return loteService.getMovimentacoesFiltradasDoLote(id, tipoMovimentacao, dataInicial.atStartOfDay(), dataFinal.atTime(23, 59, 59));
+    }
+
+
+    @PostMapping("/ajuste")
+    public Lote ajustarLote(@RequestBody @Valid AjusteDTO ajusteDTO) {
+        return this.loteService.ajustarLote(ajusteDTO);
     }
 
 }
