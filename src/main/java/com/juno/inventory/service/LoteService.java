@@ -1,8 +1,9 @@
 package com.juno.inventory.service;
 
 import com.juno.inventory.dto.AjusteDTO;
-import com.juno.inventory.dto.LoteSaidaDTO;
+import com.juno.inventory.dto.LoteOutputDTO;
 import com.juno.inventory.dto.LoteSaveDTO;
+import com.juno.inventory.dto.MovimentacaoResponseDTO;
 import com.juno.inventory.model.Lote;
 import com.juno.inventory.model.MovimentacaoEstoque;
 import com.juno.inventory.model.Produto;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +74,7 @@ public class LoteService {
     }
 
     @Transactional
-    public Lote registrarSaidaLote(LoteSaidaDTO dto) {
+    public Lote registrarSaidaLote(LoteOutputDTO dto) {
         Optional<Lote> loteBuscado = loteRepository.findById(dto.idLote());
 
         if (loteBuscado.isEmpty()) {
@@ -126,40 +128,81 @@ public class LoteService {
 
     }
 
-    public List<MovimentacaoEstoque> getMovimentacoesDoLote(Long id, TipoMovimentacao tipo) {
+    public List<MovimentacaoResponseDTO> getMovimentacoesDoLote(Long id, TipoMovimentacao tipo) {
+
         var loteBuscado = loteRepository.findById(id);
 
         if (loteBuscado.isPresent()) {
 
             Lote lote = loteBuscado.get();
 
-            if (tipo == null) {
-                return movimentacaoEstoqueRepository.findByLote(lote);
-            } else {
+            List<MovimentacaoEstoque> movimentacoes;
 
-                return movimentacaoEstoqueRepository.findByLoteAndTipoMovimentacao(lote, tipo);
+            if (tipo == null) {
+                movimentacoes = movimentacaoEstoqueRepository.findByLote(lote);
+            } else {
+                movimentacoes = movimentacaoEstoqueRepository
+                        .findByLoteAndTipoMovimentacao(lote, tipo);
             }
 
+            List<MovimentacaoResponseDTO> resposta = new ArrayList<>();
+
+            for (MovimentacaoEstoque mov : movimentacoes) {
+
+                MovimentacaoResponseDTO dto = new MovimentacaoResponseDTO(
+                        mov.getTipoMovimentacao(),
+                        mov.getLote().getCodigoLote(),
+                        mov.getQuantidade(),
+                        mov.getData(),
+                        mov.getResponsavel(),
+                        mov.getObservacao()
+                );
+
+                resposta.add(dto);
+            }
+
+            return resposta;
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado");
-
     }
 
-    public List<MovimentacaoEstoque> getMovimentacoesFiltradasDoLote(Long id, TipoMovimentacao tipoMovimentacao, LocalDateTime dataInicial, LocalDateTime dataFinal) {
+    public List<MovimentacaoResponseDTO> getMovimentacoesFiltradasDoLote(Long id, TipoMovimentacao tipoMovimentacao, LocalDateTime dataInicial, LocalDateTime dataFinal) {
 
         var LoteBuscado = loteRepository.findById(id);
 
         if (LoteBuscado.isPresent()) {
 
             Lote loteUsing = LoteBuscado.get();
+            List<MovimentacaoEstoque> movimentacoes;
+
+
 
             if (tipoMovimentacao == null) {
-                return movimentacaoEstoqueRepository.findByLoteAndDataBetween(loteUsing, dataInicial, dataFinal);
+                movimentacoes = movimentacaoEstoqueRepository.findByLoteAndDataBetween(loteUsing, dataInicial, dataFinal);
             } else {
-                return movimentacaoEstoqueRepository.findByLoteAndTipoMovimentacaoAndDataBetween(loteUsing, tipoMovimentacao, dataInicial, dataFinal);
+                movimentacoes =  movimentacaoEstoqueRepository.findByLoteAndTipoMovimentacaoAndDataBetween(loteUsing, tipoMovimentacao, dataInicial, dataFinal);
 
             }
+
+            List<MovimentacaoResponseDTO> resposta = new ArrayList<>();
+
+            for(MovimentacaoEstoque mov: movimentacoes){
+                MovimentacaoResponseDTO dto = new MovimentacaoResponseDTO(
+                        mov.getTipoMovimentacao(),
+                        mov.getLote().getCodigoLote(),
+                        mov.getQuantidade(),
+                        mov.getData(),
+                        mov.getResponsavel(),
+                        mov.getObservacao()
+                );
+                resposta.add(dto);
+
+            }
+
+            return resposta;
+
+
 
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado.");
@@ -168,7 +211,7 @@ public class LoteService {
     }
 
     @Transactional
-    public Lote ajustarLote(AjusteDTO ajusteDTO) {
+    public Lote ajustarLote(AjusteDTO ajusteDTO){
 
         var loteBuscado = loteRepository.findById(ajusteDTO.idLote());
 

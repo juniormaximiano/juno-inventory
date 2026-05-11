@@ -1,8 +1,9 @@
 package com.juno.inventory.controller;
 
 import com.juno.inventory.dto.AjusteDTO;
-import com.juno.inventory.dto.LoteSaidaDTO;
+import com.juno.inventory.dto.LoteOutputDTO;
 import com.juno.inventory.dto.LoteSaveDTO;
+import com.juno.inventory.dto.MovimentacaoResponseDTO;
 import com.juno.inventory.model.Lote;
 import com.juno.inventory.model.MovimentacaoEstoque;
 import com.juno.inventory.model.TipoMovimentacao;
@@ -30,7 +31,7 @@ public class LoteController {
     }
 
     @PostMapping("/saida")
-    public Lote darBaixaLote(@RequestBody @Valid LoteSaidaDTO dto) {
+    public Lote darBaixaLote(@RequestBody @Valid LoteOutputDTO dto) {
         return this.loteService.registrarSaidaLote(dto);
     }
 
@@ -46,7 +47,7 @@ public class LoteController {
 
 
     @GetMapping("/{id}/movimentacoesPorTipo")
-    public List<MovimentacaoEstoque> buscarMovimentacoesDoLote(
+    public List<MovimentacaoResponseDTO> buscarMovimentacoesDoLote(
             @PathVariable Long id,
             @RequestParam(required = false) TipoMovimentacao tipo
     ) {
@@ -54,7 +55,7 @@ public class LoteController {
     }
 
     @GetMapping("/{id}/movimentacoesPorPeriodo")
-    public List<MovimentacaoEstoque> buscarMovimentacoesPorPeriodo(
+    public List<MovimentacaoResponseDTO> buscarMovimentacoesPorPeriodo(
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal,
