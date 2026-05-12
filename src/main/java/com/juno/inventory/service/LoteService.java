@@ -148,17 +148,7 @@ public class LoteService {
             List<MovimentacaoResponseDTO> resposta = new ArrayList<>();
 
             for (MovimentacaoEstoque mov : movimentacoes) {
-
-                MovimentacaoResponseDTO dto = new MovimentacaoResponseDTO(
-                        mov.getTipoMovimentacao(),
-                        mov.getLote().getCodigoLote(),
-                        mov.getQuantidade(),
-                        mov.getData(),
-                        mov.getResponsavel(),
-                        mov.getObservacao()
-                );
-
-                resposta.add(dto);
+                resposta.add(converterParaDTO(mov));
             }
 
             return resposta;
@@ -187,17 +177,8 @@ public class LoteService {
 
             List<MovimentacaoResponseDTO> resposta = new ArrayList<>();
 
-            for(MovimentacaoEstoque mov: movimentacoes){
-                MovimentacaoResponseDTO dto = new MovimentacaoResponseDTO(
-                        mov.getTipoMovimentacao(),
-                        mov.getLote().getCodigoLote(),
-                        mov.getQuantidade(),
-                        mov.getData(),
-                        mov.getResponsavel(),
-                        mov.getObservacao()
-                );
-                resposta.add(dto);
-
+            for (MovimentacaoEstoque mov : movimentacoes) {
+                resposta.add(converterParaDTO(mov));
             }
 
             return resposta;
@@ -243,6 +224,20 @@ public class LoteService {
             }
 
 
+    }
+
+    public MovimentacaoResponseDTO converterParaDTO(MovimentacaoEstoque movimentacaoEstoque) {
+
+        MovimentacaoResponseDTO dto = new MovimentacaoResponseDTO(
+                movimentacaoEstoque.getTipoMovimentacao(),
+                movimentacaoEstoque.getLote().getCodigoLote(),
+                movimentacaoEstoque.getQuantidade(),
+                movimentacaoEstoque.getData(),
+                movimentacaoEstoque.getResponsavel(),
+                movimentacaoEstoque.getObservacao()
+        );
+
+        return dto;
     }
 }
 
