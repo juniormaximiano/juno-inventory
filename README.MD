@@ -1,89 +1,168 @@
+<div align="center">
+
 # 📦 Juno Inventory
 
-API backend para controle de estoque baseada em lotes, com foco em rastreabilidade de movimentações.
+**API REST para controle de estoque baseado em lotes, com rastreabilidade automática de movimentações.**
 
----
-##             ⚠️ Status  ⚠️️
+![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-brightgreen?style=flat-square&logo=springboot)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-blue?style=flat-square&logo=mysql)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker)
+![License](https://img.shields.io/badge/Licença-MIT-yellow?style=flat-square)
 
-🚧 Em desenvolvimento (MVP em evolução) 🚧
-
----
-
-## 🚀 Sobre o projeto
-
-O **Juno Inventory** é um MVP de um sistema WMS (Warehouse Management System), desenvolvido com foco em lógica de negócio e organização de backend.
-
-O sistema permite controlar o estoque através de **lotes**, registrando automaticamente todas as movimentações realizadas.
+</div>
 
 ---
 
-## ✅ Funcionalidades implementadas
+## 📖 Sobre
 
-* Cadastro de produtos
-* Registro de entrada de lote
-* Controle de estoque por lote
-* Definição automática de quantidade inicial e atual
-* Validação de produto existente
-* Prevenção de duplicidade de lote por produto
-* Geração automática de movimentação de entrada
+O **Juno Inventory** é um sistema backend de controle de estoque desenvolvido como MVP com foco em rastreabilidade de movimentações por lote.
 
----
+O sistema permite:
 
-## 🛠️ Tecnologias utilizadas
+- 📦 Cadastro de produtos
+- 🗂️ Criação de lotes vinculados a produtos
+- 🔄 Movimentações de entrada, saída e ajuste
+- 📋 Histórico completo de estoque
+- 🔍 Filtros de movimentação por tipo e período
 
-* Java
-* Spring Boot
-* Spring Data JPA
-* MySQL
-* Docker
+> Toda movimentação é registrada automaticamente, permitindo auditoria e rastreabilidade do estoque sem intervenção manual.
 
 ---
 
-## ⚙️ Como rodar o projeto
+## ✅ Funcionalidades
 
-### 1. Build do projeto
+| Status | Funcionalidade |
+|--------|----------------|
+| ✅ | Cadastro de produtos |
+| ✅ | Criação de lotes vinculados a produtos |
+| ✅ | Controle de quantidade inicial e atual |
+| ✅ | Entrada automática ao criar lote |
+| ✅ | Baixa de estoque |
+| ✅ | Ajuste manual de estoque |
+| ✅ | Histórico de movimentações |
+| ✅ | Filtro por tipo de movimentação |
+| ✅ | Filtro por período |
+| ✅ | Combinação de filtros |
+| ✅ | Validação de produto existente |
+| ✅ | Prevenção de lote duplicado por produto |
+| ✅ | Prevenção de estoque negativo |
+| ✅ | DTOs de resposta para movimentações |
+| ✅ | Documentação Swagger/OpenAPI |
+| ✅ | Docker Compose |
+
+---
+
+## 🛠️ Tecnologias
+
+| Tecnologia | Versão |
+|------------|--------|
+| Java | 17 |
+| Spring Boot | 3.x |
+| Spring Data JPA | — |
+| Hibernate | — |
+| MySQL | 8.x |
+| Docker / Docker Compose | — |
+| Swagger / SpringDoc OpenAPI | — |
+
+---
+
+## 🚀 Como rodar
+
+### Pré-requisitos
+
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+### 1. Clonar o projeto
 
 ```bash
-./mvnw clean package
+git clone https://github.com/juniormaximiano/juno-inventory.git
+cd juno-inventory
 ```
 
-### 2. Subir o ambiente com Docker
+### 2. Subir o banco de dados
 
 ```bash
-docker compose up -d --build
+docker compose up -d
 ```
 
-### 3. Acessar a aplicação
+### 3. Rodar a aplicação
 
-http://localhost:8080
+```bash
+./mvnw spring-boot:run
 
-Swagger:
-http://localhost:8080/swagger-ui/index.html
-
----
-
-## 📌 Próximas implementações
-
-* Baixa de estoque (saída de lote)
-* Regras de consumo (FIFO / FEFO)
-* Consulta de histórico de movimentações
-* Melhorias de validação e tratamento de erro
-* Estruturação de autenticação
+````
 
 ---
 
-## 🧠 Objetivo
+## 🌐 Acesso
 
-Este projeto está sendo desenvolvido como um **MVP em evolução**, com foco em aprendizado prático de backend.
-
-A proposta é construir gradualmente um sistema de controle de estoque baseado em lotes, aproximando-se de cenários reais de mercado.
-
-O projeto ainda está **incompleto**, e novas funcionalidades estão sendo adicionadas conforme a evolução do desenvolvimento.
-
-O foco principal é:
-
-* consolidar lógica de negócio
-* melhorar modelagem de dados
-* aplicar boas práticas de backend
+| Serviço | URL |
+|---------|-----|
+| API | http://localhost:8080 |
+| Swagger UI | http://localhost:8080/swagger-ui/index.html |
 
 ---
+
+## 📡 Endpoints
+
+### Produtos
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/produtos` | Cria um novo produto |
+
+### Lotes
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/lotes` | Cria um novo lote |
+| `POST` | `/lotes/saida` | Registra saída de estoque |
+| `POST` | `/lotes/ajuste` | Realiza ajuste manual de estoque |
+| `GET` | `/lotes` | Lista todos os lotes |
+| `GET` | `/lotes/{id}` | Busca lote por ID |
+
+### Movimentações
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/lotes/{id}/movimentacoesPorTipo` | Lista movimentações por tipo |
+| `GET` | `/lotes/{id}/movimentacoesPorPeriodo` | Lista movimentações por período e tipo opcional |
+
+---
+
+## 📌 Regras de negócio
+
+- Lotes só podem ser criados para **produtos existentes**
+- **Estoque negativo não é permitido**
+- A criação de lote gera automaticamente uma **movimentação de entrada**
+- Ajustes de estoque geram movimentações do tipo `AJUSTE`
+- O histórico suporta **filtros por tipo e período**
+- **Código de lote duplicado** para o mesmo produto não é permitido
+
+---
+
+## 🗂️ Estrutura do projeto
+
+```
+src/main/java/com/juno/inventory/
+├── controller/    # Endpoints REST
+├── dto/           # DTOs de request/response
+├── model/         # Entidades JPA
+├── repository/    # Acesso ao banco de dados
+└── service/       # Regras de negócio
+```
+
+
+---
+
+## 📄 Licença
+
+Distribuído sob a licença [MIT](LICENSE).
+
+---
+
+<div align="center">
+  Feito com ☕ por <a href="https://github.com/juniormaximiano">Junior Maximiano</a>
+</div>
