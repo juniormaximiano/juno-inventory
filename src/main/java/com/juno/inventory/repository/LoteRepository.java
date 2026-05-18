@@ -14,4 +14,6 @@ public interface LoteRepository extends JpaRepository<Lote,Long> {
     List<Lote> getLoteByCodigoLote(String codigoLote);
 
     boolean existsByCodigoLoteAndProduto(String codigoLote, Produto produto);
+
+    List<Lote> findByCodigoLote(String codigoLote);
 }
